@@ -135,7 +135,8 @@ def test_list_archives_ignores_unrelated_files(tmp_path: Path):
     store.update("v2", author_id=1)
     (tmp_path / "archive" / "stray.txt").write_text("garbage", encoding="utf-8")
     (tmp_path / "archive" / "system-bogus.txt").write_text(
-        "wrong extension", encoding="utf-8",
+        "wrong extension",
+        encoding="utf-8",
     )
     archives = store.list_archives()
     assert all(p.name.startswith("system-") and p.name.endswith(".md") for p in archives)

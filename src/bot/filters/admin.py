@@ -19,8 +19,4 @@ class AdminFilter(Filter):
 
     async def __call__(self, message: Message) -> bool:
         user = message.from_user
-        return (
-            user is not None
-            and not user.is_bot
-            and user.id in self._allowed
-        )
+        return user is not None and not user.is_bot and user.id in self._allowed

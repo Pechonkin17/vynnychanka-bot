@@ -156,7 +156,7 @@ def test_try_acquire_all_success_consumes_from_every_pair():
     b, _ = _make(capacity=2)
     assert try_acquire_all([(a, 1), (b, 1)]) is None
     # Both buckets debited.
-    assert a.peek(1) is True   # one token left
+    assert a.peek(1) is True  # one token left
     assert b.peek(1) is True
     assert try_acquire_all([(a, 1), (b, 1)]) is None
     # Now both empty.

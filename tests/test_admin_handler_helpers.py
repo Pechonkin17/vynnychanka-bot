@@ -17,7 +17,9 @@ from brain.persona import PersonaStore
 
 def _store(tmp_path: Path) -> PersonaStore:
     (tmp_path / "persona.md").write_text("v1", encoding="utf-8")
-    s = PersonaStore(active_path=tmp_path / "persona.md", archive_dir=tmp_path / "archive")
+    s = PersonaStore(
+        active_path=tmp_path / "persona.md", archive_dir=tmp_path / "archive"
+    )
     for i in range(2, 5):  # creates 3 archives
         s.update(f"v{i}", author_id=1)
     return s
@@ -66,7 +68,8 @@ def test_resolve_passes_unknown_filename_through(tmp_path: Path):
 def test_resolve_returns_none_when_no_archives(tmp_path: Path):
     (tmp_path / "persona.md").write_text("only", encoding="utf-8")
     empty = PersonaStore(
-        active_path=tmp_path / "persona.md", archive_dir=tmp_path / "archive",
+        active_path=tmp_path / "persona.md",
+        archive_dir=tmp_path / "archive",
     )
     assert _resolve_rollback_target("latest", empty) is None
     assert _resolve_rollback_target("1", empty) is None

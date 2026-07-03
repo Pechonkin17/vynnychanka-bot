@@ -3,6 +3,11 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+# Build artifacts
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
 .idea/
 .vscode/
 *.log

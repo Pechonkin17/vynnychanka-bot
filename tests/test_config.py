@@ -54,11 +54,11 @@ def test_bot_token_accepts_valid():
 @pytest.mark.parametrize(
     "bad_token",
     [
-        "short",                              # nowhere near the right shape
-        "1234567890",                         # numeric only, no colon
+        "short",  # nowhere near the right shape
+        "1234567890",  # numeric only, no colon
         "abcdef:ghijklmnopqrstuvwxyz1234567890",  # non-numeric id
-        "123:short",                          # secret too short
-        "12345:" + "A" * 30,                  # id too short
+        "123:short",  # secret too short
+        "12345:" + "A" * 30,  # id too short
     ],
 )
 def test_bot_token_rejects_malformed(bad_token: str):

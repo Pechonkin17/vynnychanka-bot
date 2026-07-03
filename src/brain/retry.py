@@ -10,14 +10,11 @@ from __future__ import annotations
 import asyncio
 import logging
 from collections.abc import Awaitable, Callable
-from typing import TypeVar
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar("T")
 
-
-async def retry_async(
+async def retry_async[T](
     operation: Callable[[], Awaitable[T]],
     *,
     attempts: int,
@@ -50,7 +47,11 @@ async def retry_async(
         except retryable as exc:
             last_exc = exc
             logger.warning(
-                "%s failed (attempt %d/%d): %s", name, attempt, attempts, exc,
+                "%s failed (attempt %d/%d): %s",
+                name,
+                attempt,
+                attempts,
+                exc,
             )
             if attempt == attempts:
                 break

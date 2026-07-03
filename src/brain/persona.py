@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -138,7 +138,9 @@ class PersonaStore:
         archived_current = self.update(content, author_id=author_id)
         logger.info(
             "Rolled back to %s by user=%s (current archived as %s)",
-            candidate.name, author_id, archived_current.name,
+            candidate.name,
+            author_id,
+            archived_current.name,
         )
         return archived_current, candidate
 
@@ -163,7 +165,9 @@ class PersonaStore:
 
         logger.info(
             "Persona updated by user=%s (archive=%s, length=%d)",
-            author_id, archive_path.name, len(cleaned),
+            author_id,
+            archive_path.name,
+            len(cleaned),
         )
         return archive_path
 
@@ -184,7 +188,7 @@ class PersonaStore:
         # Always include a counter. Combined with parsed-key sort, this
         # gives correct chronological ordering even when many updates land
         # in the same wall-clock second.
-        ts = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        ts = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         counter = 1
         while True:
             candidate = self._archive_dir / f"system-{ts}_{counter:04d}.md"
@@ -220,7 +224,7 @@ def _archive_sort_key(path: Path) -> tuple[str, int]:
     stem = path.stem  # 'system-{ts}_{counter}'
     if not stem.startswith("system-"):
         return (stem, 0)
-    rest = stem[len("system-"):]
+    rest = stem[len("system-") :]
     ts, _, counter_str = rest.rpartition("_")
     if not ts or not counter_str:
         return (rest, 0)

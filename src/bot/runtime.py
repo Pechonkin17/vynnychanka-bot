@@ -8,6 +8,7 @@ tearing everything down cleanly on exit.
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import logging
 
 from aiogram import Bot
@@ -28,11 +29,14 @@ async def _run(settings: Settings) -> None:
         identity = await BotIdentity.resolve(bot)
         logger.info(
             "Starting bot @%s (id=%s); admins=%d",
-            identity.username, identity.id, len(settings.admin_user_ids),
+            identity.username,
+            identity.id,
+            len(settings.admin_user_ids),
         )
         dp = app.build_dispatcher(services=services, identity=identity)
         await dp.start_polling(
-            bot, drop_pending_updates=settings.drop_pending_updates,
+            bot,
+            drop_pending_updates=settings.drop_pending_updates,
         )
     finally:
         await services.backend.aclose()
@@ -44,12 +48,10 @@ def main() -> None:
     """Synchronous entrypoint — read settings, configure logging, run."""
     settings = Settings()
     configure_logging(settings.log_level)
-    try:
+    # User hit Ctrl-C — exit cleanly without a stack trace.
+    # SystemExit is intentionally NOT suppressed: explicit sys.exit(code) must propagate.
+    with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(_run(settings))
-    except KeyboardInterrupt:
-        # User hit Ctrl-C — exit cleanly without a stack trace.
-        # SystemExit is intentionally NOT caught: explicit sys.exit(code) must propagate.
-        pass
 
 
 if __name__ == "__main__":

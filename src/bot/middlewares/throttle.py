@@ -94,13 +94,18 @@ class ThrottleMiddleware(BaseMiddleware):
         denied_scope, _ = active[denied_index]
         logger.info(
             "Rate-limited (%s) user=%s chat=%s",
-            denied_scope.name, user.id, event.chat.id,
+            denied_scope.name,
+            user.id,
+            event.chat.id,
         )
         await self._maybe_notify(event, user.id, denied_scope.deny_message)
         return None
 
     async def _maybe_notify(
-        self, event: Message, user_id: int, deny_message: str,
+        self,
+        event: Message,
+        user_id: int,
+        deny_message: str,
     ) -> None:
         if not self._notice_limiter.try_acquire(user_id):
             return  # already told this user recently — stay silent
@@ -108,5 +113,6 @@ class ThrottleMiddleware(BaseMiddleware):
             await event.reply(deny_message)
         except Exception:  # noqa: BLE001 — best-effort notice
             logger.exception(
-                "Failed to send rate-limit notice to %s", event.chat.id,
+                "Failed to send rate-limit notice to %s",
+                event.chat.id,
             )

@@ -56,7 +56,8 @@ class Settings(BaseSettings):
         ),
     )
     persona_path: Path = Field(
-        Path("config/persona/vynnychanka.md"), alias="PERSONA_PATH",
+        Path("config/persona/vynnychanka.md"),
+        alias="PERSONA_PATH",
         description="Path to the active persona (system prompt) file.",
     )
     messages_path: Path = Field(Path("config/messages.toml"), alias="MESSAGES_PATH")
@@ -166,7 +167,10 @@ class Settings(BaseSettings):
         return key
 
     @field_validator(
-        "persona_path", "messages_path", "persona_archive_dir", mode="after",
+        "persona_path",
+        "messages_path",
+        "persona_archive_dir",
+        mode="after",
     )
     @classmethod
     def _anchor_to_project_root(cls, value: Path) -> Path:

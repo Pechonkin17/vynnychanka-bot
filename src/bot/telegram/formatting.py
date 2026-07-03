@@ -14,7 +14,9 @@ _ELLIPSIS = "…"
 
 
 def clip_to_telegram_limit(
-    text: str, *, limit: int = TELEGRAM_MESSAGE_LIMIT,
+    text: str,
+    *,
+    limit: int = TELEGRAM_MESSAGE_LIMIT,
 ) -> str:
     """Return ``text`` unchanged if it fits, else truncated with an ellipsis.
 

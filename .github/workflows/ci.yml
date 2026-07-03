@@ -1,0 +1,93 @@
+name: CI
+
+# Runs on every change landing on main, and on PRs targeting main so problems
+# are caught before merge. Manual runs via the Actions tab too.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# A newer push to the same branch cancels an in-flight run — no wasted minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Least privilege: the jobs only need to read the repo.
+permissions:
+  contents: read
+
+env:
+  # Single source of truth for the Python version — matches the Dockerfile
+  # (python:3.12-slim), so CI tests exactly what we deploy.
+  PYTHON_VERSION: "3.12"
+
+jobs:
+  # 1. Fail fast if any secret/key was committed (now or anywhere in history).
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history so gitleaks scans every commit
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # 2. Install deps, lint, type-check, test, and build the package.
+  quality:
+    name: Lint, type-check, test & build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[dev]" build
+
+      - name: Lint (ruff)
+        run: ruff check --output-format=github .
+
+      - name: Format check (ruff)
+        run: ruff format --check .
+
+      - name: Type-check (mypy)
+        run: mypy
+
+      - name: Test (pytest)
+        run: pytest -q
+
+      - name: Build package (sdist + wheel)
+        run: python -m build
+
+      - name: Verify the built wheel installs and imports
+        run: |
+          pip install --force-reinstall --no-deps dist/*.whl
+          python -c "import bot, brain; print('import OK')"
+
+  # 3. Build the production Docker image to prove the Dockerfile still works.
+  docker:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: vynnychanka-bot:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

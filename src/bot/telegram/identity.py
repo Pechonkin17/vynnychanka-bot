@@ -19,6 +19,6 @@ class BotIdentity:
     username: str | None
 
     @classmethod
-    async def resolve(cls, bot: Bot) -> "BotIdentity":
+    async def resolve(cls, bot: Bot) -> BotIdentity:
         me = await bot.me()
         return cls(id=me.id, username=me.username)

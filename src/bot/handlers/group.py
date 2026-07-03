@@ -23,9 +23,7 @@ from brain.contract import ChatBackend, ChatBackendError, ChatRequest
 logger = logging.getLogger(__name__)
 
 group_router = Router(name="group")
-group_router.message.filter(
-    F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP})
-)
+group_router.message.filter(F.chat.type.in_({ChatType.GROUP, ChatType.SUPERGROUP}))
 
 
 @group_router.message(AddressedFilter())

@@ -31,7 +31,7 @@ class TextPayload:
     entities: tuple[MessageEntity, ...]
 
     @classmethod
-    def from_message(cls, message: Message) -> "TextPayload":
+    def from_message(cls, message: Message) -> TextPayload:
         text = message.text or message.caption or ""
         entities = message.entities or message.caption_entities or ()
         return cls(text=text, entities=tuple(entities))
@@ -93,6 +93,7 @@ def bot_mention_entities(
 ) -> Sequence[MessageEntity]:
     """Return only the entities that mention the bot, in original order."""
     return tuple(
-        e for e in payload.entities
+        e
+        for e in payload.entities
         if is_bot_mention(e, payload.text, bot_id, bot_username)
     )

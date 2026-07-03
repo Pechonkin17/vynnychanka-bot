@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import pytest
-
 from bot.telegram.mentions import (
     TextPayload,
     bot_mention_entities,

@@ -24,9 +24,7 @@ async def on_error(event: ErrorEvent, bot: Bot, messages: Messages) -> bool:
     Returns ``True`` so aiogram stops further error propagation.
     """
     update_id = event.update.update_id if event.update else None
-    logger.exception(
-        "Unhandled exception (update=%s): %s", update_id, event.exception
-    )
+    logger.exception("Unhandled exception (update=%s): %s", update_id, event.exception)
 
     chat_id = _chat_id_from(event)
     if chat_id is not None:

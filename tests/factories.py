@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from aiogram.types import Chat, Message, MessageEntity, User
 
 
-def make_user(*, user_id: int = 1, username: str | None = "alice", is_bot: bool = False) -> User:
+def make_user(
+    *, user_id: int = 1, username: str | None = "alice", is_bot: bool = False
+) -> User:
     return User(id=user_id, is_bot=is_bot, first_name="A", username=username)
 
 
@@ -22,7 +24,10 @@ def utf16_entity(
     entity_type: str = "mention",
     user: User | None = None,
 ) -> MessageEntity:
-    """Build a MessageEntity for ``fragment`` inside ``text`` with correct UTF-16 offsets."""
+    """Build a MessageEntity for ``fragment`` inside ``text``.
+
+    Offsets are computed in UTF-16 code units, as the Telegram API expects.
+    """
     encoded = text.encode("utf-16-le")
     fragment_encoded = fragment.encode("utf-16-le")
     byte_offset = encoded.find(fragment_encoded)
@@ -50,7 +55,7 @@ def make_message(
 ) -> Message:
     return Message(
         message_id=1,
-        date=datetime.now(timezone.utc),
+        date=datetime.now(UTC),
         chat=chat or make_chat(),
         from_user=from_user or make_user(),
         text=text,

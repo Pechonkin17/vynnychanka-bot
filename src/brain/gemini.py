@@ -64,9 +64,7 @@ class GeminiBackend(ChatBackend):
                 name="gemini.generate_content",
             )
         except Exception as exc:
-            raise ChatBackendError(
-                "AI backend did not return a usable response"
-            ) from exc
+            raise ChatBackendError("AI backend did not return a usable response") from exc
 
     async def _call_once(self, user_text: str) -> str:
         response = await self._client.aio.models.generate_content(
@@ -111,5 +109,5 @@ class GeminiBackend(ChatBackend):
                 continue
             result = method()
             if hasattr(result, "__await__"):
-                await result  # type: ignore[misc]
+                await result
             return

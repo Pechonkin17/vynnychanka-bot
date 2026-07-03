@@ -13,6 +13,7 @@ immediately, no restart, with every previous version archived.
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from aiogram import F, Router
 from aiogram.enums import ChatType
@@ -58,15 +59,14 @@ def build_admin_router(admin_filter: AdminFilter) -> Router:
             return
         try:
             archive_path = persona_store.update(
-                body, author_id=_author_id(message),
+                body,
+                author_id=_author_id(message),
             )
         except EmptyPromptError:
             await message.reply(messages.errors.prompt_empty)
             return
         except PromptTooLongError as exc:
-            await message.reply(
-                messages.errors.prompt_too_long.format(max=exc.limit)
-            )
+            await message.reply(messages.errors.prompt_too_long.format(max=exc.limit))
             return
         await message.reply(
             messages.commands.setprompt_ok.format(archive=archive_path.name)
@@ -85,7 +85,8 @@ def build_admin_router(admin_filter: AdminFilter) -> Router:
             await message.reply(text)
             return
         document = BufferedInputFile(
-            text.encode("utf-8"), filename="persona-current.md",
+            text.encode("utf-8"),
+            filename="persona-current.md",
         )
         await message.reply_document(document, caption=header)
 
@@ -129,7 +130,8 @@ def build_admin_router(admin_filter: AdminFilter) -> Router:
             return
         try:
             archived, restored = persona_store.rollback(
-                target, author_id=_author_id(message),
+                target,
+                author_id=_author_id(message),
             )
         except UnknownArchiveError:
             await message.reply(messages.commands.rollback_unknown)
@@ -141,13 +143,12 @@ def build_admin_router(admin_filter: AdminFilter) -> Router:
             await message.reply(messages.errors.prompt_empty)
             return
         except PromptTooLongError as exc:
-            await message.reply(
-                messages.errors.prompt_too_long.format(max=exc.limit)
-            )
+            await message.reply(messages.errors.prompt_too_long.format(max=exc.limit))
             return
         await message.reply(
             messages.commands.rollback_ok.format(
-                restored=restored.name, archived=archived.name,
+                restored=restored.name,
+                archived=archived.name,
             )
         )
 
@@ -193,7 +194,7 @@ def _resolve_rollback_target(arg: str, store: PersonaStore) -> str | None:
     return arg
 
 
-def _read_first_line(path, width: int) -> str:
+def _read_first_line(path: Path, width: int) -> str:
     """Return the file's first non-empty line trimmed to ``width`` chars.
 
     Errors (missing file, decode failure) yield an empty string — caller may

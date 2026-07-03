@@ -23,7 +23,7 @@ class ErrorMessages:
     rate_limit_user: str
     rate_limit_chat: str
     prompt_empty: str
-    prompt_too_long: str           # supports ``{max}`` placeholder
+    prompt_too_long: str  # supports ``{max}`` placeholder
     prompt_corrupt_archive: str
 
 
@@ -79,7 +79,10 @@ def load_messages(path: Path) -> Messages:
             prompt_empty=_require_str(raw, "errors", "prompt_empty", path),
             prompt_too_long=_require_str(raw, "errors", "prompt_too_long", path),
             prompt_corrupt_archive=_require_str(
-                raw, "errors", "prompt_corrupt_archive", path,
+                raw,
+                "errors",
+                "prompt_corrupt_archive",
+                path,
             ),
         ),
         commands=CommandMessages(
@@ -89,20 +92,35 @@ def load_messages(path: Path) -> Messages:
             setprompt_usage=_require_str(raw, "commands", "setprompt_usage", path),
             setprompt_ok=_require_str(raw, "commands", "setprompt_ok", path),
             currentprompt_header=_require_str(
-                raw, "commands", "currentprompt_header", path,
+                raw,
+                "commands",
+                "currentprompt_header",
+                path,
             ),
             promptversions_empty=_require_str(
-                raw, "commands", "promptversions_empty", path,
+                raw,
+                "commands",
+                "promptversions_empty",
+                path,
             ),
             promptversions_header=_require_str(
-                raw, "commands", "promptversions_header", path,
+                raw,
+                "commands",
+                "promptversions_header",
+                path,
             ),
             promptversions_footer=_require_str(
-                raw, "commands", "promptversions_footer", path,
+                raw,
+                "commands",
+                "promptversions_footer",
+                path,
             ),
             rollback_usage=_require_str(raw, "commands", "rollback_usage", path),
             rollback_unknown=_require_str(
-                raw, "commands", "rollback_unknown", path,
+                raw,
+                "commands",
+                "rollback_unknown",
+                path,
             ),
             rollback_ok=_require_str(raw, "commands", "rollback_ok", path),
         ),
@@ -112,7 +130,5 @@ def load_messages(path: Path) -> Messages:
 def _require_str(raw: dict[str, Any], section: str, key: str, path: Path) -> str:
     value = raw.get(section, {}).get(key)
     if not isinstance(value, str) or not value.strip():
-        raise MessagesFileError(
-            f"{path}: [{section}].{key} must be a non-empty string"
-        )
+        raise MessagesFileError(f"{path}: [{section}].{key} must be a non-empty string")
     return value
