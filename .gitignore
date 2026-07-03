@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.idea/
+.vscode/
+*.log
+.pytest_cache/
+# Persona archive snapshots are runtime state, not source.
+config/persona/archive/*.md

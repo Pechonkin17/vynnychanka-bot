@@ -1,0 +1,18 @@
+# Ruff configuration. Run: ruff check . / ruff format .
+target-version = "py312"
+line-length = 90
+src = ["src", "tests"]
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # isort (import ordering)
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "SIM",  # flake8-simplify
+]
+
+[lint.per-file-ignores]
+# Tests reach into private helpers and use bare fixtures freely.
+"tests/**" = ["B011", "SIM"]

@@ -1,0 +1,82 @@
+# All user-facing canned replies the bot may send. Edit values, restart bot.
+# Keys are required — removing a key will make the bot fail to start.
+#
+# Persona: Vynnychanka — a loud, sassy, funny 19-y.o. from Vynnyky. Youth slang
+# + Galician markers ("та шо ти", "файно", "ая", "дзус", "най", "ору", "кринж").
+# Playful and cheeky, never actually cruel.
+
+[errors]
+# Sent when the AI backend cannot produce a response after all retries.
+generation_failed = "Упс, мій мозок завис на секунду 🤯 Дай хвильку і кидай ще раз — я не така тупа зазвичай."
+
+# Sent when the bot crashes on an unexpected exception while handling a message.
+internal_error = "Ой всьо, шось у мене всередині крінжануло і зламалось. Ребутни мене питанням ще раз, окей?"
+
+# Sent when the user message exceeds MAX_USER_TEXT_LENGTH.
+message_too_long = "Воу-воу, це шо, реферат?? Скороти, бо ЦЕ все я читати не буду, ти шо."
+
+# Sent when the user personally hits the per-user rate limit.
+rate_limit_user = "Гальмуй, цяця! Не так швидко — дай мені відсапнути пару сек, і строчи далі."
+
+# Sent when the chat as a whole hits the per-chat rate limit.
+rate_limit_chat = "Народ, ви шо всі разом навалились?? В чаті рейв якийсь, я не встигаю, ору. Стишіться троха."
+
+# Admin error: empty prompt body (e.g., /setprompt with no text).
+prompt_empty = "Ти мені шо, пустоту прислав? Давай текст, ґазда, не зли мене."
+
+# Admin error: prompt longer than the store's MAX_LENGTH. {max} = limit.
+prompt_too_long = "Задовгий той промпт — я стільки в голову не влізу. Максимум {max} знаків, ужимайся."
+
+# Admin error: archive file is not valid UTF-8 (corruption / wrong file).
+prompt_corrupt_archive = "Той архів якийсь покручений, UTF-8 не читається. Глянь файл на серваку, там зашквар."
+
+[commands]
+# Reply to /start.
+start = "О, хтось новенький залетів! Дароу 😏 Я Винничанка. Згадай мене через @ або відпиши на моє — і поболтаємо. Тільки без нудятини, окей?"
+
+# Reply to /help. Triple-quoted strings allow multi-line content.
+help = """\
+Та шо тут пояснювати, все ж просто:
+Озиваюсь, тіко як згадаєш мене через @ або відпишеш на мою писанину — так заведено.
+А як гоню не туди — то не до мене претензії, мій характер прописаний у промпті на серваку.
+Всьо, погнали балакати.\
+"""
+
+# Sent when a non-admin tries to use an admin command (/setprompt, /currentprompt).
+admin_only = "Тпру, стоп. Це тіко для своїх, а тебе в списку нема. Дзус звідси 😌"
+
+# /setprompt with no body — show usage.
+setprompt_usage = """\
+Хочеш переписати моє нутро? Кидай так: /setprompt <новий текст>
+Старий характер сама заархівую — нічо не загубиться, чіл.\
+"""
+
+# /setprompt succeeded. {archive} is replaced with the archive filename.
+setprompt_ok = "Готово, шеф! Старий характер закинула в скриню: {archive}. Тепер я новенька 😎"
+
+# Header line shown before the current prompt body when /currentprompt is used.
+currentprompt_header = "Ось шо в мене зараз у голові:"
+
+# /promptversions when the archive is empty.
+promptversions_empty = "Пусто в скрині — мене ще ніхто не переінакшував. Незаймана, ха."
+
+# /promptversions header line (followed by the list of archive filenames).
+promptversions_header = "Всі мої версії (свіжі зверху):"
+
+# /promptversions footer (hint how to roll back).
+promptversions_footer = "Відкотити: /rollback <ім'я файла>"
+
+# /rollback with no body — show usage (mentions shortcuts).
+rollback_usage = """\
+Кажи одне з:
+  /rollback latest         — на попередній характер
+  /rollback oldest         — на найстарший
+  /rollback <число>        — на N-ий зі списку /promptversions (1 = найновіший)
+  /rollback <ім'я файла>   — точно за ім'ям\
+"""
+
+# /rollback got an unknown archive name.
+rollback_unknown = "Такого імені в скрині нема. Глянь /promptversions, шеф."
+
+# /rollback succeeded. {restored} = archive we restored from; {archived} = where the outgoing prompt was put.
+rollback_ok = "Готово, відкотилась до {restored}. Теперішнє закинула в скриню як {archived}. Погнали далі 😎"

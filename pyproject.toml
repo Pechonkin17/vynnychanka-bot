@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vynnychanka-bot"
+version = "0.1.0"
+description = "Telegram group-chat AI clone. Two packages: bot/ (transport) and brain/ (AI)."
+requires-python = ">=3.12"
+dependencies = [
+    "aiogram>=3.13,<4",
+    "google-genai>=1.0,<2",
+    "pydantic>=2.9,<3",
+    "pydantic-settings>=2.6,<3",
+    "python-dotenv>=1.0,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.24,<0.25",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+
+[project.scripts]
+vynnychanka-bot = "bot.runtime:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+# "src" makes `bot`/`brain` importable; "." makes the `tests` package importable.
+pythonpath = ["src", "."]
