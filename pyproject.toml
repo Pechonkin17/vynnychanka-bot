@@ -7,6 +7,8 @@ name = "vynnychanka-bot"
 version = "0.1.0"
 description = "Telegram group-chat AI clone. Two packages: bot/ (transport) and brain/ (AI)."
 requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 dependencies = [
     "aiogram>=3.13,<4",
     "google-genai>=1.0,<2",

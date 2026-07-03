@@ -95,3 +95,9 @@ src/brain/                      AI layer (the clone)
   langgraph.py                  reserved seam for a future stateful backend
 tests/                          unit tests
 ```
+
+## License
+
+Licensed under the [Apache License 2.0](LICENSE). You may use, modify, and
+distribute this code, including commercially, provided you retain the copyright
+notice and license. The software is provided "as is", without warranty.
