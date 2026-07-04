@@ -46,7 +46,7 @@ def test_multiple_updates_create_distinct_archives(tmp_path: Path):
     a = store.update("v2", author_id=1)
     b = store.update("v3", author_id=1)
     c = store.update("v4", author_id=1)
-    assert {a, b, c} == set([a, b, c])  # all distinct
+    assert len({a, b, c}) == 3  # all three archive paths are distinct
     assert a.read_text(encoding="utf-8") == "v1"
     assert b.read_text(encoding="utf-8") == "v2"
     assert c.read_text(encoding="utf-8") == "v3"
