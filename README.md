@@ -37,9 +37,10 @@ Two files control what the bot says — no code changes required:
 it through Telegram (see *Admin commands*).
 
 Runtime settings come from `.env` (see [`.env.example`](.env.example)):
-`BOT_TOKEN`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `PERSONA_PATH`,
-`PERSONA_ARCHIVE_DIR`, `MESSAGES_PATH`, `ADMIN_USER_IDS`,
-`MAX_USER_TEXT_LENGTH`, `DROP_PENDING_UPDATES`, `RATE_LIMIT_*`, `LOG_LEVEL`.
+`BOT_TOKEN`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `GEMINI_MAX_OUTPUT_TOKENS`,
+`GEMINI_TIMEOUT_SECONDS`, `PERSONA_PATH`, `PERSONA_ARCHIVE_DIR`,
+`MESSAGES_PATH`, `ADMIN_USER_IDS`, `MAX_USER_TEXT_LENGTH`,
+`DROP_PENDING_UPDATES`, `RATE_LIMIT_*`, `LOG_LEVEL`.
 
 ## Admin commands (configure the clone from your own account)
 
@@ -73,8 +74,31 @@ pytest
 
 ```bash
 docker build -t vynnychanka-bot .
-docker run --env-file .env -v vynnychanka_persona:/app/config/persona vynnychanka-bot
+docker run -d --name vynnychanka --restart unless-stopped \
+  --env-file .env -v vynnychanka_persona:/app/config/persona vynnychanka-bot
 ```
+
+The persona lives on the named volume `vynnychanka_persona`, so live edits and
+the archive survive restarts. On first run the entrypoint seeds the volume with
+the image's default persona; an empty bind mount is seeded too (otherwise the
+bot would crash with no persona to load).
+
+### Updating the persona
+
+> ⚠️ A named volume is seeded from the image **only once**. Rebuilding the image
+> with a new default persona does **not** update an existing volume — the
+> volume's copy wins. To ship a new default to a running deployment, write it
+> into the volume yourself and restart (the bot reads the persona once, at
+> startup):
+
+```bash
+docker run --rm -v vynnychanka_persona:/v -v "$PWD/config/persona":/src \
+  alpine cp /src/vynnychanka.md /v/vynnychanka.md
+docker restart vynnychanka
+```
+
+Or edit it live from Telegram with `/setprompt` — no restart needed (see
+*Admin commands*).
 
 ## Project layout
 

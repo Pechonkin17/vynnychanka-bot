@@ -45,6 +45,16 @@ class Settings(BaseSettings):
         description="Google AI Studio API key.",
     )
     gemini_model: str = Field("gemini-2.5-flash", alias="GEMINI_MODEL", min_length=1)
+    gemini_timeout_seconds: float = Field(
+        30.0,
+        alias="GEMINI_TIMEOUT_SECONDS",
+        gt=0,
+        le=300,
+        description=(
+            "Per-request deadline for a single Gemini call. A stalled response "
+            "is aborted after this and retried; without it a hang blocks forever."
+        ),
+    )
     gemini_max_output_tokens: int = Field(
         400,
         alias="GEMINI_MAX_OUTPUT_TOKENS",

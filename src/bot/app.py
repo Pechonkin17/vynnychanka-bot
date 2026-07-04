@@ -64,6 +64,7 @@ def build_services(settings: Settings) -> Services:
         model=settings.gemini_model,
         get_persona=lambda: persona_store.text,
         max_output_tokens=settings.gemini_max_output_tokens,
+        request_timeout=settings.gemini_timeout_seconds,
     )
     admin_filter = AdminFilter(settings.admin_user_ids)
     return Services(

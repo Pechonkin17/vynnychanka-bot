@@ -1,0 +1,36 @@
+# Keep the Docker build context small and secret-free. The Dockerfile copies
+# only pyproject.toml, src/, config/, and the entrypoint explicitly, but an
+# empty/lean context is faster and removes any chance of a future `COPY . .`
+# baking secrets or junk into an image layer.
+
+# Secrets and local env
+.env
+.env.*
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Virtualenv and Python caches
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+
+# Editors / CI / tests / docs (not needed to run the bot)
+.idea/
+.vscode/
+.github/
+tests/
+README.md

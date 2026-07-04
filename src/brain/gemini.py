@@ -2,16 +2,30 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from collections.abc import Callable
 
+import httpx
 from google import genai
+from google.genai import errors as genai_errors
 from google.genai import types
 
 from brain.contract import ChatBackend, ChatBackendError, ChatRequest
 from brain.retry import retry_async
 
 logger = logging.getLogger(__name__)
+
+#: Only genuinely transient failures are worth retrying. Auth errors, malformed
+#: requests, and safety blocks (all ``ClientError`` / 4xx) will fail again on
+#: retry, so they propagate on the first attempt instead of wasting quota and
+#: adding backoff latency to a doomed call.
+_RETRYABLE_ERRORS: tuple[type[BaseException], ...] = (
+    ChatBackendError,  # our own "empty response" signal — worth another try
+    TimeoutError,  # the per-call asyncio.timeout deadline below
+    genai_errors.ServerError,  # Gemini 5xx
+    httpx.TransportError,  # connect / read / pool network failures
+)
 
 
 class GeminiBackend(ChatBackend):
@@ -37,6 +51,7 @@ class GeminiBackend(ChatBackend):
         max_output_tokens: int = 400,
         max_attempts: int = 3,
         base_backoff: float = 1.0,
+        request_timeout: float = 30.0,
     ) -> None:
         self._client = genai.Client(api_key=api_key)
         self._model = model
@@ -46,6 +61,7 @@ class GeminiBackend(ChatBackend):
         self._cached_config: types.GenerateContentConfig | None = None
         self._max_attempts = max_attempts
         self._base_backoff = base_backoff
+        self._request_timeout = request_timeout
 
     async def reply(self, request: ChatRequest) -> str:
         """Return Gemini's reply to ``request.text``.
@@ -61,17 +77,22 @@ class GeminiBackend(ChatBackend):
                 lambda: self._call_once(request.text),
                 attempts=self._max_attempts,
                 base_backoff=self._base_backoff,
+                retryable=_RETRYABLE_ERRORS,
                 name="gemini.generate_content",
             )
         except Exception as exc:
             raise ChatBackendError("AI backend did not return a usable response") from exc
 
     async def _call_once(self, user_text: str) -> str:
-        response = await self._client.aio.models.generate_content(
-            model=self._model,
-            contents=user_text,
-            config=self._current_config(),
-        )
+        # Bound every call: a stalled connection otherwise hangs forever, and
+        # since retry only fires on *exceptions*, a hang would never retry. The
+        # timeout raises TimeoutError, which _RETRYABLE_ERRORS treats as retryable.
+        async with asyncio.timeout(self._request_timeout):
+            response = await self._client.aio.models.generate_content(
+                model=self._model,
+                contents=user_text,
+                config=self._current_config(),
+            )
         text = (response.text or "").strip()
         if not text:
             raise ChatBackendError("empty response from Gemini")
